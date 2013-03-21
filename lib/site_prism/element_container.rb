@@ -93,6 +93,18 @@ module SitePrism::ElementContainer
     end
   end
 
+  def create_visibility_checker(element_name, *find_args)
+    method_name = "is_#{element_name.to_s}_visible?"
+    build_checker_or_waiter element_name, method_name, *find_args do
+      define_method method_name do
+        Capybara.using_wait_time 0 do
+          element_exists? *find_args
+        end
+        find_first(*find_args).visible?
+      end
+    end
+  end
+
   def create_waiter element_name, *find_args
     method_name = "wait_for_#{element_name.to_s}"
     build_checker_or_waiter element_name, method_name, *find_args do
